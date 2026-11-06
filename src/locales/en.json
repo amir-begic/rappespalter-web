@@ -23,11 +23,12 @@
   "hero.pause": "Pause video",
   "hero.play": "Play video",
 
-  "tiles.label": "Rappespalter in numbers",
-  "tiles.accounts": "accounts to create",
+  "tiles.label": "Rappespalter at a glance",
   "tiles.cloud": "bytes of your data in the cloud",
+  "tiles.systems": "operating systems: Windows, macOS, Linux",
   "tiles.languages": "languages: English, German, French, Italian",
-  "tiles.price": "forever. MIT licensed",
+  "tiles.free": "Free",
+  "tiles.price": "forever, thanks to the MIT license",
 
   "features.kicker": "Features",
   "features.title": "What your bank app doesn't tell you",
@@ -84,7 +85,6 @@
   "swiss.kicker": "Made for Switzerland",
   "swiss.title": "Speaks franc, Säule 3a and camt.053",
   "swiss.lead": "Most finance apps are built for somewhere else. Rappespalter starts from how money works here, and the core works for anyone who wants to track spending and savings.",
-  "swiss.chf": "Amounts in francs, written the Swiss way: Fr. 1'234.50",
   "swiss.pillars": "Säule 3a and 2. Säule in your net worth and your retirement forecast",
   "swiss.banks": "Raiffeisen exports, plus camt.053 and camt.054 statements from any Swiss bank",
   "swiss.tax": "Tax estimates from the Swiss Federal Tax Administration's calculator",

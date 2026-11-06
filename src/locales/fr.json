@@ -23,11 +23,12 @@
   "hero.pause": "Mettre la vidéo en pause",
   "hero.play": "Lire la vidéo",
 
-  "tiles.label": "Rappespalter en chiffres",
-  "tiles.accounts": "compte à créer",
+  "tiles.label": "Rappespalter en bref",
   "tiles.cloud": "octet de tes données dans le cloud",
+  "tiles.systems": "systèmes d'exploitation : Windows, macOS, Linux",
   "tiles.languages": "langues : français, allemand, italien, anglais",
-  "tiles.price": "pour toujours. Licence MIT",
+  "tiles.free": "Gratuit",
+  "tiles.price": "pour toujours, grâce à la licence MIT",
 
   "features.kicker": "Fonctions",
   "features.title": "Ce que ton app bancaire ne te dit pas",
@@ -84,7 +85,6 @@
   "swiss.kicker": "Conçu pour la Suisse",
   "swiss.title": "Parle franc, pilier 3a et camt.053",
   "swiss.lead": "La plupart des apps de finances sont pensées pour ailleurs. Rappespalter part de la façon dont l'argent fonctionne ici, et le cœur convient à toute personne qui veut suivre ses dépenses et son épargne.",
-  "swiss.chf": "Montants en francs, écrits à la suisse : Fr. 1 234,50",
   "swiss.pillars": "Pilier 3a et 2e pilier dans ta fortune nette et ta prévision de retraite",
   "swiss.banks": "Exports Raiffeisen, et relevés camt.053 et camt.054 de toute banque suisse",
   "swiss.tax": "Estimations d'impôts avec le calculateur de l'Administration fédérale des contributions (AFC)",

@@ -23,11 +23,12 @@
   "hero.pause": "Video anhalten",
   "hero.play": "Video abspielen",
 
-  "tiles.label": "Rappespalter in Zahlen",
-  "tiles.accounts": "Konten, die du eröffnen musst",
+  "tiles.label": "Rappespalter auf einen Blick",
   "tiles.cloud": "Bytes deiner Daten in der Cloud",
+  "tiles.systems": "Betriebssysteme: Windows, macOS, Linux",
   "tiles.languages": "Sprachen: Deutsch, Französisch, Italienisch, Englisch",
-  "tiles.price": "für immer. MIT-Lizenz",
+  "tiles.free": "Gratis",
+  "tiles.price": "für immer, dank MIT-Lizenz",
 
   "features.kicker": "Funktionen",
   "features.title": "Was dir deine Bank-App nicht sagt",
@@ -84,7 +85,6 @@
   "swiss.kicker": "Für die Schweiz gemacht",
   "swiss.title": "Spricht Franken, Säule 3a und camt.053",
   "swiss.lead": "Die meisten Finanz-Apps sind für anderswo gebaut. Rappespalter geht davon aus, wie Geld hier funktioniert, und der Kern taugt für alle, die Ausgaben und Erspartes im Blick behalten wollen.",
-  "swiss.chf": "Beträge in Franken, wie man sie hier schreibt: Fr. 1'234.50",
   "swiss.pillars": "Säule 3a und 2. Säule im Reinvermögen und in der Vorsorgeprognose",
   "swiss.banks": "Raiffeisen-Exporte und camt.053- und camt.054-Auszüge jeder Schweizer Bank",
   "swiss.tax": "Steuerschätzungen mit dem Rechner der Eidgenössischen Steuerverwaltung (ESTV)",

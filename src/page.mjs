@@ -152,10 +152,10 @@ function tiles(ctx) {
   return `
 <section class="wrap" aria-label="${attr(t("tiles.label"))}">
   <ul class="tiles">
-    ${tile("green", "0", "tiles.accounts")}
-    ${tile("red", "0", "tiles.cloud")}
+    ${tile("green", "0", "tiles.cloud")}
+    ${tile("red", "3", "tiles.systems")}
     ${tile("blue", "4", "tiles.languages")}
-    ${tile("yellow", "Fr.&nbsp;0", "tiles.price")}
+    ${tile("yellow", t("tiles.free"), "tiles.price")}
   </ul>
 </section>`
 }
@@ -194,7 +194,7 @@ function features(ctx) {
 
 function swiss(ctx) {
   const { t } = ctx
-  const items = ["chf", "pillars", "banks", "tax"]
+  const items = ["pillars", "banks", "tax"]
     .map(k => `<li>${ICONS.check}<span>${t(`swiss.${k}`)}</span></li>`).join("")
   return `
 <section class="section">
