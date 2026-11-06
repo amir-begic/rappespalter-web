@@ -1,0 +1,16 @@
+{
+  "name": "rappespalter.dev",
+  "version": "1.0.0",
+  "private": true,
+  "license": "MIT",
+  "description": "Website for Rappespalter, the open-source personal finance app.",
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "check": "node scripts/check.mjs",
+    "dev": "node scripts/build.mjs && node scripts/serve.mjs"
+  }
+}

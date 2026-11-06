@@ -1,0 +1,4 @@
+# Build output (scripts/build.mjs); CI builds and deploys it.
+/dist/
+node_modules/
+.DS_Store

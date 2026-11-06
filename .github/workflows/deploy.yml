@@ -1,0 +1,151 @@
+# Builds the website and publishes it on Hostpoint (rappespalter.dev, hosted in
+# Switzerland).
+#
+# Every push and pull request is built and checked (scripts/check.mjs: the texts of all
+# four languages match English, every link and file on the pages exists). Only main
+# is published. Pull requests stop after the check.
+#
+# The page names the app's latest version, the one promote.yml in the app repository
+# made the latest release, which is also what the download buttons fetch
+# (…/releases/latest/download/<file>). A daily run picks up a newly promoted version
+# without a commit here. Run by hand (Actions → Deploy → Run workflow) to publish
+# right after promoting.
+#
+# Publishing copies dist/ to the web folder over SSH with rsync and removes files that
+# are no longer in the build. It needs these (Settings → Secrets and variables →
+# Actions), and stops if one is missing (README.md, Deploying):
+#   variables  HOSTPOINT_HOST, HOSTPOINT_USER, HOSTPOINT_PATH (HOSTPOINT_PORT, default 22)
+#   secrets    HOSTPOINT_SSH_KEY, HOSTPOINT_KNOWN_HOSTS
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+  pull_request: {}
+  workflow_dispatch: {}
+  schedule:
+    - cron: "23 5 * * *" # daily, 05:23 UTC
+
+permissions:
+  contents: read
+
+# One publish at a time; a newer one waits instead of cancelling an upload halfway.
+# Pull requests get their own group per branch.
+concurrency:
+  group: deploy-${{ github.event_name == 'pull_request' && github.ref || 'main' }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+# Same as the app's release.yml: run JavaScript actions on Node 24 now; it becomes the
+# default on 2026-06-16, after which this line is a harmless no-op.
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+  APP_REPO: amir-begic/rappespalter
+  SITE_URL: https://rappespalter.dev
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        # No dependencies to install: the build and the check are plain Node scripts.
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: The app's latest version
+        # The latest (promoted) release, not the newest pre-release. If it can't be read
+        # (no release yet, the repository private) the page simply leaves the version out.
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          tag="$(gh release view --repo "$APP_REPO" --json tagName -q .tagName 2>/dev/null || true)"
+          if [ -n "$tag" ]; then
+            echo "Latest app release: $tag"
+          else
+            echo "::warning::Couldn't read the latest release of $APP_REPO; building without a version."
+          fi
+          echo "RAPPESPALTER_VERSION=${tag#v}" >> "$GITHUB_ENV"
+
+      - name: Build
+        run: node scripts/build.mjs
+
+      - name: Check
+        run: node scripts/check.mjs
+
+      - name: Upload site
+        if: github.event_name != 'pull_request'
+        uses: actions/upload-artifact@v4
+        with:
+          name: site
+          path: dist
+          include-hidden-files: true # .htaccess
+          if-no-files-found: error
+          retention-days: 1
+
+  deploy:
+    needs: build
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment:
+      name: production
+      url: ${{ env.SITE_URL }}
+    steps:
+      - name: Download site
+        uses: actions/download-artifact@v4
+        with:
+          name: site
+          path: dist
+
+      - name: SSH access
+        env:
+          HOST: ${{ vars.HOSTPOINT_HOST }}
+          USER: ${{ vars.HOSTPOINT_USER }}
+          TARGET: ${{ vars.HOSTPOINT_PATH }}
+          KEY: ${{ secrets.HOSTPOINT_SSH_KEY }}
+          KNOWN_HOSTS: ${{ secrets.HOSTPOINT_KNOWN_HOSTS }}
+        run: |
+          for v in HOST USER TARGET KEY KNOWN_HOSTS; do
+            if [ -z "${!v}" ]; then echo "::error::$v is missing (see README.md, Deploying)."; exit 1; fi
+          done
+          # rsync --delete empties the target of everything not in the build, so it has
+          # to be the site's own folder, never the home folder or above.
+          case "$TARGET" in
+            /|.|./|~|~/|*..*) echo "::error::HOSTPOINT_PATH '$TARGET' isn't a site folder."; exit 1 ;;
+          esac
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$KEY" > ~/.ssh/deploy
+          chmod 600 ~/.ssh/deploy
+          # Known hosts from a secret: the server is checked, never trusted on first sight.
+          printf '%s\n' "$KNOWN_HOSTS" > ~/.ssh/known_hosts
+
+      - name: Publish
+        env:
+          HOST: ${{ vars.HOSTPOINT_HOST }}
+          USER: ${{ vars.HOSTPOINT_USER }}
+          PORT: ${{ vars.HOSTPOINT_PORT || '22' }}
+          TARGET: ${{ vars.HOSTPOINT_PATH }}
+        # --checksum: the files are fresh from the build, so their times say nothing.
+        # --delete-delay: removes old files only after the new ones are in place.
+        # .well-known/ belongs to the host (certificate checks) and is left alone.
+        run: |
+          rsync --recursive --links --compress --checksum --itemize-changes \
+            --delete --delete-delay --exclude=/.well-known/ \
+            --chmod=D755,F644 \
+            -e "ssh -i $HOME/.ssh/deploy -p $PORT -o IdentitiesOnly=yes -o StrictHostKeyChecking=yes" \
+            dist/ "$USER@$HOST:${TARGET%/}/"
+
+      - name: Check the live site
+        # Fails if the site doesn't answer; warns if the server ignores .htaccess (no
+        # security headers), which would also mean no 404 page and no HTTPS redirect.
+        run: |
+          headers="$(curl -fsS --retry 3 --retry-delay 5 -D - -o /dev/null "$SITE_URL/")"
+          echo "$headers" | head -1
+          grep -qi '^content-security-policy:' <<< "$headers" \
+            || echo "::warning::$SITE_URL/ has no Content-Security-Policy header: is .htaccess in the web folder and mod_headers on?"
+          status="$(curl -s -o /dev/null -w '%{http_code}' "$SITE_URL/does-not-exist")"
+          [ "$status" = 404 ] || echo "::warning::A missing page answered $status instead of 404."
