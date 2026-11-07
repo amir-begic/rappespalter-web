@@ -169,10 +169,11 @@ function features(ctx) {
       <h3>${t(`f.${id}.title`)}</h3>
       <p>${t(`f.${id}.text`)}</p>
     </div>
-    <div class="stage stage-${stage}">
+    <a class="stage stage-${stage}" href="${root}assets/shots/${shot}.webp" aria-haspopup="dialog" data-zoom>
       <img src="${root}assets/shots/${shot}.webp" width="${size[0]}" height="${size[1]}" loading="lazy" decoding="async"
         alt="${attr(t(`f.${id}.alt`))}">
-    </div>
+      <span class="sr-only"> ${t("zoom.open")}</span>
+    </a>
   </article>`).join("")
   const more = MORE.map(id => `
     <li class="reveal"><h4>${t(`more.${id}.title`)}</h4><p>${t(`more.${id}.text`)}</p></li>`).join("")
@@ -337,7 +338,33 @@ function footer(ctx) {
 
 // ---------------------------------------------------------------------------------
 
-function head(ctx, { title, description, canonical, alternates = true, noindex = false }) {
+// What the app is, for search engines and AI tools: the same facts the page states.
+// No ratings or reviews: there are none yet, and they must never be made up.
+function structuredData(ctx) {
+  const { t, lang, version } = ctx
+  const data = {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    name: "Rappespalter",
+    url: `${SITE_URL}/${langPath(lang)}`,
+    description: t("meta.description"),
+    applicationCategory: "FinanceApplication",
+    operatingSystem: "Windows, macOS, Linux",
+    ...(version && { softwareVersion: version }),
+    offers: { "@type": "Offer", price: "0", priceCurrency: "CHF" },
+    license: "https://opensource.org/licenses/MIT",
+    downloadUrl: `${REPO}/releases/latest`,
+    sameAs: REPO,
+    inLanguage: LOCALES.map(l => l.lang),
+    image: `${SITE_URL}/assets/icon.png`,
+    screenshot: FEATURES.map(f => `${SITE_URL}/assets/shots/${f.shot}.webp`),
+    author: { "@type": "Person", name: OWNER },
+  }
+  // "<" escaped so no text can end the script element.
+  return `\n  <script type="application/ld+json">${JSON.stringify(data).replace(/</g, "\\u003c")}</script>`
+}
+
+function head(ctx, { title, description, canonical, alternates = true, noindex = false, data = "" }) {
   const { lang, root } = ctx
   const sub = ctx.sub ?? ""
   const links = alternates
@@ -368,7 +395,7 @@ function head(ctx, { title, description, canonical, alternates = true, noindex =
   <link rel="preload" href="${root}assets/fonts/bricolage-grotesque-latin-opsz-normal.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="${root}assets/fonts/space-grotesk-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="${root}assets/styles.css">
-  <script>document.documentElement.classList.add("js")</script>${ctx.headScript ?? ""}
+  <script>document.documentElement.classList.add("js")</script>${ctx.headScript ?? ""}${data}
   <script src="${root}assets/main.js" defer></script>
 </head>`
 }
@@ -386,6 +413,7 @@ export function page(ctx) {
     title: t("meta.title"),
     description: t("meta.description"),
     canonical: `${SITE_URL}/${langPath(lang)}`,
+    data: structuredData(ctx),
   })}
 <body>${decoration}
 ${header(ctx)}
@@ -400,6 +428,11 @@ ${contribute(ctx)}
 ${nameStory(ctx)}
 </main>
 ${footer(ctx)}
+<dialog class="zoom">
+  <button type="button" class="zoom-close" aria-label="${attr(t("zoom.close"))}">
+    <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+  </button>
+</dialog>
 </body>
 </html>
 `

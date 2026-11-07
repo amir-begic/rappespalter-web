@@ -5,7 +5,8 @@
 // Texts: every language has exactly English's keys, none empty, and each keeps
 // English's {placeholders} and <tags> (like the app's `pnpm i18n:check`).
 // Built pages: every local link, image, video and script points at a file that
-// exists, every #anchor at an id on the page, and no {placeholder} is left over.
+// exists, every #anchor at an id on the page, no {placeholder} is left over, and the
+// structured data parses.
 
 import { readdir, readFile, stat } from "node:fs/promises"
 import { fileURLToPath } from "node:url"
@@ -61,6 +62,10 @@ if (!(await exists(DIST))) {
     if (!/<html lang="[a-z]{2}-CH">/.test(html)) problems.push(`${file}: <html> has no lang`)
     const leftover = html.replace(/<(script|style)[\s\S]*?<\/\1>/g, "").match(/\{\w+\}/)
     if (leftover) problems.push(`${file}: placeholder ${leftover[0]} left in the page`)
+
+    for (const [, json] of html.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)) {
+      try { JSON.parse(json) } catch { problems.push(`${file}: the structured data isn't valid JSON`) }
+    }
 
     for (const [, url] of html.matchAll(/\s(?:href|src|poster)="([^"]+)"/g)) {
       if (/^(https?:|mailto:|data:)/.test(url)) continue

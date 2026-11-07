@@ -33,6 +33,8 @@
   "features.kicker": "Features",
   "features.title": "What your bank app doesn't tell you",
   "features.lead": "Spending, budgets, net worth, investments and retirement, in one place and in francs.",
+  "zoom.open": "Enlarge image",
+  "zoom.close": "Close",
 
   "f.dashboard.kicker": "Dashboard",
   "f.dashboard.title": "Every month at a glance",

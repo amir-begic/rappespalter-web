@@ -33,6 +33,8 @@
   "features.kicker": "Funktionen",
   "features.title": "Was dir deine Bank-App nicht sagt",
   "features.lead": "Ausgaben, Budgets, Reinvermögen, Anlagen und Vorsorge, an einem Ort und in Franken.",
+  "zoom.open": "Bild vergrössern",
+  "zoom.close": "Schliessen",
 
   "f.dashboard.kicker": "Übersicht",
   "f.dashboard.title": "Jeder Monat auf einen Blick",

@@ -235,6 +235,10 @@ html:not(.js) .video-toggle { display: none; }
 .feature-text p:last-child { color: color-mix(in oklch, var(--foreground) 80%, var(--background)); }
 .stage { padding: clamp(1rem, 3vw, 2.25rem); border-radius: 2rem; }
 .stage img { border-radius: 1rem; box-shadow: var(--shadow); }
+a.stage { display: block; cursor: zoom-in; transition: transform 300ms cubic-bezier(0.33, 1, 0.68, 1); }
+a.stage:hover { transform: scale(1.015); }
+a.stage:focus-visible { border-radius: 2rem; }
+a.stage.is-zoomed { visibility: hidden; } /* its copy in the dialog takes over */
 .stage-blue { background: var(--pop-blue); }
 .stage-yellow { background: var(--pop-yellow); }
 .stage-green { background: var(--pop-green); }
@@ -355,10 +359,35 @@ html:not(.js) .video-toggle { display: none; }
 .more .reveal:nth-child(4n + 3), .help .reveal:nth-child(4n + 3) { transition-delay: 160ms; }
 .more .reveal:nth-child(4n + 4), .help .reveal:nth-child(4n + 4) { transition-delay: 240ms; }
 
+/* A screenshot enlarged to the window, in its coloured frame (main.js). The image's
+   width follows the window, so the frame keeps its size around it. --ratio comes from
+   the image. */
+html:has(.zoom[open]) {
+  overflow: hidden; scrollbar-gutter: stable; /* the page stays put without its scrollbar */
+  background: color-mix(in srgb, oklch(0.2 0.012 280) 75%, var(--background)); /* that strip, dimmed too */
+}
+.zoom {
+  --pad: clamp(1rem, 3vw, 2.25rem);
+  position: fixed; inset: 0; width: 100%; height: 100%; max-width: none; max-height: none;
+  margin: 0; padding: 0.75rem; border: 0; background: transparent; overflow: hidden;
+  container-type: size; cursor: zoom-out;
+}
+.zoom[open] { display: grid; place-items: center; }
+.zoom::backdrop { background: oklch(0.2 0.012 280 / 75%); }
+.zoom .stage { padding: var(--pad); transform-origin: top left; }
+.zoom .stage img { width: min(100cqw - 2 * var(--pad), (100cqh - 2 * var(--pad)) * var(--ratio)); max-width: none; }
+.zoom-close {
+  position: fixed; top: 1.25rem; right: 1.25rem; z-index: 1;
+  display: grid; place-items: center; width: 2.75rem; height: 2.75rem; padding: 0;
+  border: 0; border-radius: 50%; background: var(--card); color: var(--foreground);
+  box-shadow: var(--shadow); cursor: pointer;
+}
+.zoom-close:focus-visible { border-radius: 50%; }
+
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   .blob { animation: none; }
   .js .reveal { opacity: 1; transform: none; transition: none; }
-  .btn, .tile, .help a { transition: none; }
-  .btn:hover, .tile:hover, .help a:hover { transform: none; }
+  .btn, .tile, .help a, a.stage { transition: none; }
+  .btn:hover, .tile:hover, .help a:hover, a.stage:hover { transform: none; }
 }

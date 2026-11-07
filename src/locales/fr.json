@@ -33,6 +33,8 @@
   "features.kicker": "Fonctions",
   "features.title": "Ce que ton app bancaire ne te dit pas",
   "features.lead": "Dépenses, budgets, fortune nette, placements et prévoyance, au même endroit et en francs.",
+  "zoom.open": "Agrandir l’image",
+  "zoom.close": "Fermer",
 
   "f.dashboard.kicker": "Tableau de bord",
   "f.dashboard.title": "Chaque mois en un coup d'œil",
